@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -11,8 +12,8 @@ namespace RestaurantCityDiscordBot.Resources.Database
         public DbSet<Trade> Trades { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder Options)
         {
-            string DbLocation = Assembly.GetEntryAssembly().Location.Replace(@"bin\Debug\netcoreapp2.1", @"Data\Database.sqlite");
-            Options.UseSqlite("Data Source = " + DbLocation);
+            string DbLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).Replace(@"bin\Debug\netcoreapp2.1", @"Data\");
+            Options.UseSqlite($"Data Source={DbLocation}Database.sqlite");
         }
     }
 }

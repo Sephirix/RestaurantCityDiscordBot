@@ -65,7 +65,7 @@ namespace RestaurantCityDiscordBot
             if (Context.User.IsBot) return;
 
             int ArgPos = 0;
-            if (!(Message.HasStringPrefix("a+", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos))) return;
+            if (!(Message.HasStringPrefix("a+ ", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos))) return;
 
             var Result = await commands.ExecuteAsync(Context, ArgPos);
             if (!Result.IsSuccess)

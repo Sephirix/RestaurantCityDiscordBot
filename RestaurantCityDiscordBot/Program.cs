@@ -76,13 +76,23 @@ namespace RestaurantCityDiscordBot
             if(Context.Message == null || Context.Message.Content == "") return;
             if (Context.User.IsBot) return;
 
+            if (Message.Channel.Id != 495567892667170849) return;
             int ArgPos = 0;
-            if (!(Message.HasStringPrefix("$$", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos))) return;
+            if (!(Message.HasStringPrefix("$$", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos)))
+            {
+                await Context.Message.DeleteAsync();
+                return;
+            } 
+            
+                
 
             var Result = await commands.ExecuteAsync(Context, ArgPos);
             if (!Result.IsSuccess)
+            {
                 Console.WriteLine($"[{DateTime.Now} at Commands] Something went wrong with the executing a command. " +
                     $"Text: {Context.Message.Content} | Error: {Result.ErrorReason}");
+                
+            }
         }
 
         private async Task Client_Log(LogMessage log)

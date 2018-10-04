@@ -138,7 +138,78 @@ namespace RestaurantCityDiscordBot.Core.Data
             }
             
         }
+        public static async Task updateInviteLink(ulong userId,string link)
+        {
+            try
+            {
+                using (var DbContext = new SqliteDbContext())
+                {
+                    if (DbContext.Trades.Where(x => x.UserId == userId).Count() < 1)
+                    {
+                        DbContext.Trades.Add(new Trade
+                        {
+                            UserId = userId,
+                            Have = "",
+                            Need = "",
+                            inGameName = "",
+                            inviteLink = link
+                        });
+                    }
+                    else
+                    {
+                        Trade trade = DbContext.Trades.Where(x => x.UserId == userId).FirstOrDefault();
 
+                        trade.inviteLink = link;
+
+
+
+                        DbContext.Trades.Update(trade);
+                    }
+                    await DbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+
+        public static async Task updateIGN(ulong userId, string ign)
+        {
+            try
+            {
+                using (var DbContext = new SqliteDbContext())
+                {
+                    if (DbContext.Trades.Where(x => x.UserId == userId).Count() < 1)
+                    {
+                        DbContext.Trades.Add(new Trade
+                        {
+                            UserId = userId,
+                            Have = "",
+                            Need = "",
+                            inGameName = ign,
+                            inviteLink = ""
+                        });
+                    }
+                    else
+                    {
+                        Trade trade = DbContext.Trades.Where(x => x.UserId == userId).FirstOrDefault();
+
+                        trade.inGameName  = ign;
+
+
+
+                        DbContext.Trades.Update(trade);
+                    }
+                    await DbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
         public static async Task updateIngredients(ulong userId, string need,string have, string ign, string link)
         {
             try

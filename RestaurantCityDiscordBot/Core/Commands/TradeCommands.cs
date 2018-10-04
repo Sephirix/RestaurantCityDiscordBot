@@ -12,12 +12,46 @@ namespace RestaurantCityDiscordBot.Core.Commands
 {
     public class TradeCommands : ModuleBase<SocketCommandContext>
     {
-
-        public async Task welcome()
+        [Command("Help"), Alias("help")]
+        public async Task help()
         {
-            await Context.Channel.SendMessageAsync("I'm up guys!");
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.WithTitle("Trade-Bot Commands");
+            embed.AddField("Creating your trade list:","$$Create <Need> <Have> <In-Game-Name> <Invite-Link>" + " \n " +
+                "Example: $$Create icecream,chicken,tomato potato,wasabi Sephirix_IX https://game.streets.cafe/?from=696239");
+            embed.AddField("Adding an ingredient to needs:", "$$+need <ingredients>" + " \n " +
+                "Example: $$+need cream,sugar");
+            embed.AddField("Adding an ingredient to your stock:", "$$+have <ingredients>" + " \n " +
+                "Example: $$+need cream,sugar");
+            embed.AddField("Removing an ingredient to needs:", "$$-need <ingredients>" + " \n " +
+               "Example: $$-need cream,sugar");
+            embed.AddField("Removing an ingredient to your stock:", "$$-have <ingredients>" + " \n " +
+                "Example: $$-need cream,sugar");
+            embed.AddField("Resetting your list:", "$$reset" + " \n " +
+                "Example: $$reset");
+            embed.AddField("Updating your Invite-Link:", "$$Link <Invite-Link>" + " \n " +
+            "Example: $$InviteLink https://game.streets.cafe/?from=696239");
+            embed.AddField("Updating In-Game-Name:", "$$IGN + <In-Game-Name>" + " \n " +
+            "Example: $$IGN Sephirix_IX ");
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
+        [Command("IGN"), Alias("ign"), Summary("Update your IGN.")]
+        public async Task ign(string ign)
+        {
+           await Data.Data.updateIGN(Context.User.Id, ign);
+            await Context.Channel.SendMessageAsync("IGN Updated");
+            await ingredientsList();
+        }
+
+        [Command("Link"), Alias("link"), Summary("Update your IGN.")]
+        public async Task link(string link)
+        {
+            await Data.Data.updateInviteLink(Context.User.Id, link);
+            await Context.Channel.SendMessageAsync("Invite Link Updated");
+            await ingredientsList();
+        }
         [Command("+need"), Alias("+Need"), Summary("Makes a list of ingredients user needs.")]
         public async Task addNeededIngredients(string ingredients = "")
         {

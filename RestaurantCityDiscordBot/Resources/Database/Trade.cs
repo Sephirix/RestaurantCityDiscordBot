@@ -12,5 +12,7 @@ namespace RestaurantCityDiscordBot.Resources.Database
         public ulong UserId { get; set; }
         public string Need { get; set; }
         public string Have { get; set; }
+        public string inGameName { get; set; }
+        public string inviteLink { get;set; }
     }
 }

@@ -7,6 +7,7 @@ using System.IO;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RestaurantCityDiscordBot.Core.Commands;
 #endregion
 
 namespace RestaurantCityDiscordBot
@@ -15,6 +16,7 @@ namespace RestaurantCityDiscordBot
     {
         private DiscordSocketClient client;
         private CommandService commands;
+        
 
         static void Main(string[] args) =>
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -34,10 +36,11 @@ namespace RestaurantCityDiscordBot
             });
 
             client.MessageReceived += Client_MessageReceived;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
-
             client.Ready += Client_Ready;
             client.Log += Client_Log;
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+
+            
 
             string Token = "";
             using (var Stream = new FileStream((Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Replace(@"bin\Debug\netcoreapp2.1",@"Data\Token.txt"), FileMode.Open, FileAccess.Read))
@@ -54,18 +57,27 @@ namespace RestaurantCityDiscordBot
         private async Task Client_Ready()
         {
             await client.SetGameAsync("AllRound Bot - Tutorial", "", StreamType.NotStreaming);
+            Console.WriteLine("I'm up");
+            
+            if (client.GetChannel(497203012536631322) is IMessageChannel channel)
+                await channel.SendMessageAsync("Hi, I'm up!");
+            
+
+        
         }
+
+     
 
         private async Task Client_MessageReceived(SocketMessage MessageParam)
         {
             var Message = MessageParam as SocketUserMessage;
             var Context = new SocketCommandContext(client, Message);
-
+        
             if(Context.Message == null || Context.Message.Content == "") return;
             if (Context.User.IsBot) return;
 
             int ArgPos = 0;
-            if (!(Message.HasStringPrefix("a+ ", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos))) return;
+            if (!(Message.HasStringPrefix("$$", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos))) return;
 
             var Result = await commands.ExecuteAsync(Context, ArgPos);
             if (!Result.IsSuccess)

@@ -138,7 +138,7 @@ namespace RestaurantCityDiscordBot.Core.Data
             }
             
         }
-        public static async Task updateInviteLink(ulong userId,string link)
+        public static async Task updateInviteLink(ulong userId,string ign,string link)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace RestaurantCityDiscordBot.Core.Data
                             UserId = userId,
                             Have = "",
                             Need = "",
-                            inGameName = "",
+                            inGameName = ign,
                             inviteLink = link
                         });
                     }
@@ -159,7 +159,7 @@ namespace RestaurantCityDiscordBot.Core.Data
                     {
                         Trade trade = DbContext.Trades.Where(x => x.UserId == userId).FirstOrDefault();
 
-                        trade.inviteLink = link;
+                        trade.inviteLink =  link;
 
 
 
@@ -175,7 +175,7 @@ namespace RestaurantCityDiscordBot.Core.Data
 
         }
 
-        public static async Task updateIGN(ulong userId, string ign)
+        public static async Task updateIGN(ulong userId, string ign,string link)
         {
             try
             {
@@ -189,7 +189,7 @@ namespace RestaurantCityDiscordBot.Core.Data
                             Have = "",
                             Need = "",
                             inGameName = ign,
-                            inviteLink = ""
+                            inviteLink = link
                         });
                     }
                     else
@@ -259,6 +259,7 @@ namespace RestaurantCityDiscordBot.Core.Data
             }
 
         }
+
 
     }
 }

@@ -31,16 +31,22 @@ namespace RestaurantCityDiscordBot.Core.Commands
             embed.AddField("Resetting your list:", "$$reset" + " \n " +
                 "Example: $$reset");
             embed.AddField("Updating your Invite-Link:", "$$Link <Invite-Link>" + " \n " +
-            "Example: $$InviteLink https://game.streets.cafe/?from=696239");
+            "Example: $$InviteLink 483324");
             embed.AddField("Updating In-Game-Name:", "$$IGN + <In-Game-Name>" + " \n " +
             "Example: $$IGN Sephirix_IX ");
+           // await Context.Channel.SendMessageAsync("", false, embed.Build());
+            embed.AddField("Viewing your list:", "$$list " + " \n " +
+            "Example: $$list");
+           // await Context.Channel.SendMessageAsync("", false, embed.Build());
+            embed.AddField("Viewing someone else's list:", "$$list <mention the person>" + " \n " +
+            "Example: $$list @Sephirix#8434");
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
         [Command("IGN"), Alias("ign"), Summary("Update your IGN.")]
         public async Task ign(string ign)
         {
-           await Data.Data.updateIGN(Context.User.Id, ign);
+           await Data.Data.updateIGN(Context.User.Id, ign,"");
             await Context.Channel.SendMessageAsync("IGN Updated");
             await ingredientsList();
         }
@@ -48,7 +54,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
         [Command("Link"), Alias("link"), Summary("Update your IGN.")]
         public async Task link(string link)
         {
-            await Data.Data.updateInviteLink(Context.User.Id, link);
+            await Data.Data.updateInviteLink(Context.User.Id,"", link);
             await Context.Channel.SendMessageAsync("Invite Link Updated");
             await ingredientsList();
         }
@@ -58,7 +64,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
             Console.WriteLine("addNeededIngredients fired");
             if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
             {
-                await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                 Console.WriteLine("Empty");
                 return;
             }
@@ -70,7 +76,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
             }
 
             await Data.Data.addIngredients(Context.User.Id, ingredients, "n");
-            await Context.Channel.SendMessageAsync("Ingredients added");
+            await Context.Channel.SendMessageAsync("Item(s) added");
             await ingredientsList();
 
         }
@@ -81,7 +87,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
             
             if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
             {
-                await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                 Console.WriteLine("Empty");
                 return;
             }
@@ -93,7 +99,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
             }
 
             await Data.Data.remove(Context.User.Id, ingredients, "n");
-            await Context.Channel.SendMessageAsync("Ingredients removed");
+            await Context.Channel.SendMessageAsync("Item removed");
             await ingredientsList();
 
         }
@@ -104,7 +110,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
 
             if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
             {
-                await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                 Console.WriteLine("Empty");
                 return;
             }
@@ -127,7 +133,7 @@ namespace RestaurantCityDiscordBot.Core.Commands
             Console.WriteLine("addNeededIngredients fired");
             if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
             {
-                await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                 Console.WriteLine("Empty");
                 return;
             }
@@ -170,28 +176,29 @@ namespace RestaurantCityDiscordBot.Core.Commands
         }
 
 
-        [Command("ingredients"), Summary("Ingredients user has")]
+        [Command("list"), Alias("List"), Summary("Ingredients user has")]
         public async Task ingredientsList(IUser user = null)
         {
             if (user == null)
             {
                 if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
                 {
-                    await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                    await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                     Console.WriteLine("Empty");
                     return;
                 }
                 var trade = (Trade)Data.Data.ingredients2(Context.User.Id);
                 var needList = (trade.Need.ToString() != "") ? trade.Need.ToString().Replace(",", "\n") : "empty";
                 var haveList = (trade.Have.ToString() != "") ? trade.Have.ToString().Replace(",", "\n") : "empty";
+                var invitelink = (trade.inviteLink == "" || trade.inviteLink.ToString().Length >= 7) ? "No Invite Link Provided" : $"Click this [Link to Add this Person](https://game.streets.cafe/?from=" + $"{trade.inviteLink})";
+
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.WithColor(96, 156, 255);
-                embed.WithTitle($"This is your Ingredients List \n \n");
-                embed.AddField("In-Game-Name: ",$"{trade.inGameName}");
-                embed.AddField("Invite Link: ", $"Click this [Link]({trade.inviteLink})");
+                embed.AddField("In-Game-Name: ", $"{trade.inGameName.Replace("_", " ")}");
+                embed.AddField("Invite Link: ",invitelink);
                 embed.AddInlineField("Looking For:", needList);
                 embed.AddInlineField("Has:", haveList);
-                
+
 
                 await Context.Channel.SendMessageAsync("", false, embed.Build());
 
@@ -200,17 +207,20 @@ namespace RestaurantCityDiscordBot.Core.Commands
             {
                 if (Data.Data.ingredients2(user.Id).ToString() == "")
                 {
-                    await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                    await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                     Console.WriteLine("Empty");
                     return;
                 }
+
+
                 var trade = (Trade)Data.Data.ingredients2(user.Id);
                 var needList = (trade.Need.ToString() != "") ? trade.Need.ToString().Replace(",", "\n") : "empty";
                 var haveList = (trade.Have.ToString() != "") ? trade.Have.ToString().Replace(",", "\n") : "empty";
+                var invitelink = (trade.inviteLink == "" || trade.inviteLink.ToString().Length >= 7) ? "No Invite Link Provided" : $"Click this [Link to Add this Person](https://game.streets.cafe/?from=" + $"{trade.inviteLink})";
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.WithColor(96, 156, 255);
-                embed.AddField("In-Game-Name: ", $"{trade.inGameName}");
-                embed.AddField("Invite Link: ", $"Click this [Link]({trade.inviteLink})");
+                embed.AddField("In-Game-Name: ", $"{trade.inGameName.Replace("_", " ")}");
+                embed.AddField("Invite Link: ", invitelink);
                 embed.AddInlineField("Looking For:", needList);
                 embed.AddInlineField("Has:", haveList);
                 await Context.Channel.SendMessageAsync("", false, embed.Build());
@@ -226,18 +236,43 @@ namespace RestaurantCityDiscordBot.Core.Commands
 
             if (Data.Data.ingredients2(Context.User.Id).ToString() == "")
             {
-                await Context.Channel.SendMessageAsync("You haven't make a list yet.");
+                await Context.Channel.SendMessageAsync("You haven't created your trade profile yet.");
                 Console.WriteLine("Empty");
                 return;
             }
             await Data.Data.deleteIngredients(Context.User.Id);
-
 
             await ingredientsList();
 
 
         }
 
+        [Command("AddMe")]
+        public async Task lookingFriends(string ign="", string link="")
+        {
+            if (link == "" && ign =="")
+            {
+                await ingredientsList();
+
+            }
+            else 
+            {
+                await Data.Data.updateIGN(Context.User.Id, ign,link);
+
+                await ingredientsList();
+            }
+        
+        }
+
+        public async void embedInvite()
+        {
+            var trade = (Trade)Data.Data.ingredients2(Context.User.Id);
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.WithColor(96, 156, 255);
+            embed.AddField("In-Game-Name: ", $"{trade.inGameName.Replace("_", " ")}");
+            embed.AddField("Invite Link: ", $"Click this [Link to Add this Person](https://game.streets.cafe/?from=" + $"{trade.inviteLink})");
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+        }
 
 
     }

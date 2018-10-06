@@ -12,8 +12,8 @@ namespace RestaurantCityDiscordBot.Resources.Database
         public DbSet<Trade> Trades { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder Options)
         {
-            string DbLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).Replace(@"bin\Debug\netcoreapp2.1", @"Data\");
-            Options.UseSqlite($"Data Source={DbLocation}Database.sqlite");
+            string DbLocation = Environment.CurrentDirectory;
+            Options.UseSqlite($@"Data Source={DbLocation}\Data\Database.sqlite");
         }
     }
 }

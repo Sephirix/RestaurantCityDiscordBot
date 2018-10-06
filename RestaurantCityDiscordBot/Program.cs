@@ -26,6 +26,7 @@ namespace RestaurantCityDiscordBot
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Debug,
+                
             });
 
             commands = new CommandService(new CommandServiceConfig
@@ -40,11 +41,12 @@ namespace RestaurantCityDiscordBot
             client.Log += Client_Log;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
 
-            
 
-            string Token = "";
-            using (var Stream = new FileStream((Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Replace(@"bin\Debug\netcoreapp2.1",@"Data\Token.txt"), FileMode.Open, FileAccess.Read))
-            using(var ReadToken = new StreamReader(Stream))
+            string Token ="";
+            string TokenP= @".\Data\Token.txt";
+            Console.WriteLine("This is the directory"+TokenP);
+          
+            using(var ReadToken = new StreamReader(TokenP))
             {
                 Token = ReadToken.ReadToEnd();
             }
@@ -76,16 +78,24 @@ namespace RestaurantCityDiscordBot
             if(Context.Message == null || Context.Message.Content == "") return;
             if (Context.User.IsBot) return;
 
-            if (Message.Channel.Id != 495567892667170849) return;
-            int ArgPos = 0;
-            if (!(Message.HasStringPrefix("$$", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos)))
-            {
-                await Context.Message.DeleteAsync();
-                return;
-            } 
-            
-                
 
+            int ArgPos = 0;
+           
+
+               
+                if (!(Message.HasStringPrefix("$$", ref ArgPos) || Message.HasMentionPrefix(client.CurrentUser, ref ArgPos)))
+                {
+
+                    if (Message.Channel.Id == 495567892667170849)
+                    {
+                        await Message.DeleteAsync();
+                    }
+                    return;
+
+
+                }
+
+            if (Message.Channel.Id != 495567892667170849) return;
             var Result = await commands.ExecuteAsync(Context, ArgPos);
             if (!Result.IsSuccess)
             {
